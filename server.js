@@ -2,7 +2,6 @@ const express = require('express');
 const path = require('path');
 const { syncAndSeed, models: { Employee, Department } } = require('./db');
 
-
 const app = express();
 app.use(require('express').json());
 

@@ -1,11 +1,12 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import Employee from './Employee';
 
-const Employees = ({ department, employees, removeFromDepartment, destroyEmployee })=> {
+const Employees = ({ employees })=> {
   return (
       <ul>
         {
-          employees.filter( employee => employee.departmentId === (department ? department.id : null )).map( employee => <Employee employee={ employee } removeFromDepartment={ removeFromDepartment } destroyEmployee={ destroyEmployee } key={ employee.id }/>)
+          employees.map( employee => <Employee employee={ employee } key={ employee.id }/>)
         }
       </ul>
   );

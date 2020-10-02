@@ -1,22 +1,28 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import Employees from './Employees';
 
-const Department = ({ department, employees, destroyEmployee, removeFromDepartment })=> {
+class Department extends React.Component{
+  render() {
     return (
       <li>
         <span className='department-title'>
-          { department ? department.name : 'No Department' } ({
-            employees.filter( employee => employee.departmentId === (department ? department.id : null) ).length
+          { this.props.department.name } ({
+            this.props.employees.filter( employee => employee.departmentId === (this.props.department ? this.props.department.id : null) ).length
           })
         </span>
         <Employees
-          department={ department }
-          employees ={ employees }
-          destroyEmployee = { destroyEmployee }
-          removeFromDepartment={ removeFromDepartment }
+          employees ={ this.props.employees.filter(employee => employee.departmentId === this.props.department.id) }
         />
       </li>
     );
+  }
 };
 
-export default Department;
+const mapState = ({  employees }) => {
+  return {
+    employees
+  };
+}
+
+export default connect(mapState)(Department);

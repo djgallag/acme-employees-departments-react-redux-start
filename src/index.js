@@ -1,56 +1,41 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import axios from 'axios';
-
 import Departments from './Departments';
-import Stats from './Stats';
+import { Provider, connect } from 'react-redux';
+import store, { destroyEmployee, fetchDepartments, fetchEmployees } from './store';
 
-class App extends React.Component{
-  constructor(){
-    super();
-    this.state = {
-      departments: [],
-      employees: []
-    };
-    this.destroyEmployee = this.destroyEmployee.bind(this);
-    this.removeFromDepartment = this.removeFromDepartment.bind(this);
-  }
-  async destroyEmployee(employee){
-    await axios.delete(`/api/employees/${employee.id}`);
-    const employees = this.state.employees.filter(_employee => employee.id !== _employee.id);
-    this.setState({ employees });
-  }
-  async removeFromDepartment(employee){
-    employee = (await axios.put(`/api/employees/${employee.id}`, { departmentId: null})).data;
-    const employees = this.state.employees.map(_employee => employee.id === _employee.id ? employee : _employee);
-    this.setState({ employees });
-  }
-  async componentDidMount(){
-    const responses = await Promise.all([
-      axios.get('/api/employees'),
-      axios.get('/api/departments'),
-    ]);
-    this.setState({
-      employees: responses[0].data,
-      departments: responses[1].data
-    });
+class _App extends React.Component{
+  componentDidMount() {
+    this.props.loadDepartments();
+    this.props.loadEmployees();
   }
   render(){
-    const { departments, employees } = this.state;
-    const { destroyEmployee, removeFromDepartment } = this;
+
     return (
       <div>
         <h1>Acme Employees And Departments</h1>
-        <Stats employees={ employees }/>
-        <Departments
-          departments={ departments }
-          employees={ employees }
-          destroyEmployee = { destroyEmployee }
-          removeFromDepartment = { removeFromDepartment }
-      />
+        <div>{ this.props.employees.length } Total Employees</div>
+        <Departments />
       </div>
     );
   }
 }
 
-ReactDOM.render(<App />, document.querySelector('#root'));
+const mapState = ({ departments, employees }) => {
+  return {
+    departments,
+    employees
+  };
+}
+
+const mapDispatch = dispatch => {
+  return {
+    loadDepartments: () => dispatch(fetchDepartments()),
+    loadEmployees: () => dispatch(fetchEmployees())
+  };
+}
+
+const App = connect(mapState, mapDispatch)(_App);
+
+ReactDOM.render(<Provider store={ store }><App /></Provider>, document.querySelector('#root'));
